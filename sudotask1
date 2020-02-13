@@ -1,0 +1,93 @@
+#!/bin/bash
+
+
+while :
+do
+str=$(grep '^sudo:.*$' /etc/group | cut -d: -f4)
+
+my_array=($(echo $str | tr "," "\n"))
+
+echo -e "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+echo -e "Press 1 for Listing users.. 2 for adding...3 for deleting...4 for exiting"
+echo -e "Enter choice"
+echo -e "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+read choice
+case $choice in
+	
+
+	1)
+		echo -e "Press (a) for listing all users (b) for only sudo users"
+		read ch
+
+		case $ch in
+			a)
+				echo -e "^^^List of all users in system^^^"
+			        cut -d: -f1,3 /etc/passwd | egrep ':[0-9]{4}$' | cut -d: -f1 ;; 
+				
+			b)
+				echo -e "^^^Current sudo users :-^^^"
+			       	echo -e -e $str
+				echo -e "^^^-^^^" ;;
+
+
+			*) echo "%%Enter only (a) or (b%%)" ;;
+		esac
+		;;
+
+	2)
+		while :
+		do
+
+			echo -e "Enter name of user you want to add in sudo"
+			read welcomeUser
+		
+			usermod -aG sudo $welcomeUser
+			echo -e "Successfully added $welcomeUser"
+
+			echo -e "Do you want to add anyone else?"
+			read anotherVip
+			echo -e "Entered choice to continue is $anotherVip"
+			
+			case $anotherVip in
+		 	
+	        		yes) continue ;;
+				no) break ;;
+
+				*) echo -e "Enter yes or no" ;;
+			esac	
+		
+		done
+		;;
+	
+	
+	3)
+		
+	
+        	echo -e "$1 wil be saved rest all sudo permissions will be revoked"
+	
+		echo -e "sudo permission revoke process acivated"
+	
+		for i in "${my_array[@]}"
+		do
+			if [[ "$i" == "$1" ]]; then
+				continue
+			else
+				echo -e "++++++++++++++++++++++++++++"
+				echo -e "deleted $i"
+				deluser $i sudo
+				echo -e "++++++++++++++++++++++++++++"
+			fi
+
+		done
+		echo -e "Successfully accomplished "
+		;;
+	
+
+	4)
+		echo "You chose to exit; BBye"
+		break ;;
+	*)
+		echo "Enter valid option please"
+		;;
+esac
+done
